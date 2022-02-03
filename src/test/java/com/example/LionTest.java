@@ -1,8 +1,13 @@
 package com.example;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 
@@ -15,20 +20,26 @@ public class LionTest {
     private final String MALE = "Самец";
     private final String sex;
     private final boolean expected;
-    private final Feline feline;
 
-    public LionTest(String sex, boolean expected, Feline feline) {
+    public LionTest(String sex, boolean expected) {
         this.sex = sex;
         this.expected = expected;
-        this.feline = feline;
     }
+
+    @Before
+    public void init() {
+        MockitoAnnotations.initMocks(this);
+    }
+
+    @Mock
+    Feline feline;
 
     @Parameterized.Parameters
     public static Object[][] createDifferentLion() {
         return new Object[][] {
-                { "Самец", true, new Feline()},
-                { "Самка", false, new Feline()},
-                { "Test", false, new Feline()},
+                { "Самец", true},
+                { "Самка", false},
+                { "Test", false},
         };
     }
 
@@ -36,6 +47,7 @@ public class LionTest {
     public void getKittens() throws Exception {
         int expected = 1;
         Lion lion = new Lion(MALE, feline);
+        Mockito.when(feline.getKittens()).thenReturn(1);
         int actual = lion.getKittens();
         assertEquals("Кол-во различается", expected, actual);
     }
@@ -56,6 +68,7 @@ public class LionTest {
     public void getFood() throws Exception {
         Lion lion = new Lion(MALE, feline);
         List<String> expectedList = List.of("Животные", "Птицы", "Рыба");
+        Mockito.when(feline.getFood("Хищник")).thenReturn(expectedList);
         List<String> actualList = lion.getFood();
         assertEquals("Содержимое списка отличается", expectedList, actualList);
     }
